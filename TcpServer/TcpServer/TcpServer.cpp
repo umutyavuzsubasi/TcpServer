@@ -27,10 +27,10 @@ int main(int argc, char* argv[]) {
 
 	if (argc == 2) {
 		port = atoi(argv[1]);
+		printf("Started at port : %d\n", port);
 	}
 	else{
 		printf("Usage %s Ip port\n", argv[0]);
-		printf("Terminating");
 		return 1;
 	}
 
@@ -97,6 +97,7 @@ int main(int argc, char* argv[]) {
 		printf("Signal handled signal number : %d\n", signalNumber);
 	}
 
+	WSACleanup();
 	printf("Terminated\n");
 	system("pause");
 	return 1;
@@ -104,6 +105,7 @@ int main(int argc, char* argv[]) {
 
 
 void signal_callback_handler(int signum) {
+	//shutdown(serverSock, SD_BOTH);
 	closesocket(serverSock);
 	WSACleanup();
 	signalNumber = signum;
@@ -126,22 +128,17 @@ int serverThread(void* param){
 	while (true)
 	{
 		int bytes_recv = recv(clientData->clientSock, clientInput, 1024, 0);
-		if (bytes_recv == -1){
-			printf("Recv Error\n");
+		if (bytes_recv <= 0){
 			break;
 		}
 
 		else if (bytes_recv > 0){
-			printf("Data Received from client %s : %s\n ", host, clientInput);
+			printf("Data Received from client %s : %s\n", host, clientInput);
  			int bytes_sent = send(clientData->clientSock, clientInput, strlen(clientInput) + 1, 0);
 			if (bytes_sent == -1){
 				printf("Send Error\n");
 				break;
 			}
-		}
-
-		else{
-			break;
 		}
 	}
 
