@@ -112,7 +112,7 @@ void signal_callback_handler(int signum) {
 }
 
 int serverThread(void* param){
-	ThreadData *clientData = ((ThreadData*)param);
+	ThreadData* clientData = ((ThreadData*) param);
 
 	char clientInput[1024] = "";
 	char* ipAddr = NULL;
@@ -128,10 +128,14 @@ int serverThread(void* param){
 	while (true)
 	{
 		int bytes_recv = recv(clientData->clientSock, clientInput, 1024, 0);
-		if (bytes_recv <= 0){
+		if (bytes_recv == 0){
+			printf("Server closed.\n");
 			break;
 		}
-
+		else if (bytes_recv == -1) {
+			printf("recv error.\n");
+			break;
+		}
 		else if (bytes_recv > 0){
 			printf("Data Received from client %s : %s\n", host, clientInput);
  			int bytes_sent = send(clientData->clientSock, clientInput, strlen(clientInput) + 1, 0);
